@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Take Your Platinum · Persona 5 Royal (PS5) Trophy Companion</title>
+  <meta name="description" content="Interactive Platinum trophy guide and companion for Persona 5 Royal on PS5 — roadmap, Third Semester deadlines, trophy tracker, classroom answers and Confidant cheat sheet." />
+  <meta name="theme-color" content="#0b0b0d" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Apply saved theme before paint to avoid a flash -->
+  <script>
+    try {
+      var s = JSON.parse(localStorage.getItem('p5r-platinum-companion-v1') || '{}');
+      if (s.theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#trophies">Skip to Trophy Tracker</a>
+
+  <!-- ======================= HERO ======================= -->
+  <header class="hero" id="top">
+    <div class="hero__stripes" aria-hidden="true"></div>
+    <div class="hero__inner">
+      <p class="hero__kicker"><span>PS5</span> Persona 5 Royal · Platinum Companion</p>
+      <h1 class="hero__title">
+        <span class="ransom">Take</span>
+        <span class="ransom ransom--alt">Your</span>
+        <span class="ransom ransom--red">Platinum</span>
+      </h1>
+      <p class="hero__sub">53 trophies · one playthrough · zero missed deadlines. Your progress saves to this browser automatically.</p>
+      <div class="hero__actions">
+        <a class="btn btn--red" href="#third-semester">Read the deadlines</a>
+        <a class="btn btn--ghost" href="#trophies">Open the tracker</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================= STICKY CONTROL DECK ======================= -->
+  <div class="deck" id="deck">
+    <nav class="jumpnav" aria-label="Section navigation">
+      <a class="jumpnav__brand" href="#top" aria-label="Back to top">P5R<span>★</span></a>
+      <ul class="jumpnav__links">
+        <li><a href="#roadmap" data-nav="roadmap">Roadmap</a></li>
+        <li><a href="#third-semester" data-nav="third-semester">Third Semester Unlock</a></li>
+        <li><a href="#trophies" data-nav="trophies">Trophy Tracker</a></li>
+        <li><a href="#classroom" data-nav="classroom">Classroom Answers</a></li>
+        <li><a href="#confidants" data-nav="confidants">Confidant Cheat Sheet</a></li>
+      </ul>
+      <div class="jumpnav__tools">
+        <button class="iconbtn" id="spoilerToggle" type="button" aria-pressed="false" title="Toggle Spoiler Shield">
+          <span class="iconbtn__icon" aria-hidden="true">🕶</span><span class="iconbtn__label">Spoilers: Hidden</span>
+        </button>
+        <button class="iconbtn" id="themeToggle" type="button" aria-pressed="false" title="Toggle theme">
+          <span class="iconbtn__icon" aria-hidden="true">☾</span><span class="iconbtn__label">Phantom Thief Dark</span>
+        </button>
+      </div>
+    </nav>
+
+    <section class="dash" aria-label="Platinum progress dashboard">
+      <div class="dash__pct">
+        <div class="ring" style="--p:0">
+          <svg viewBox="0 0 42 42" aria-hidden="true"><circle class="ring__track" cx="21" cy="21" r="17"/><circle class="ring__fill" id="ringFill" cx="21" cy="21" r="17"/></svg>
+          <span class="ring__num" id="pctNum">0%</span>
+        </div>
+        <div class="dash__rank">
+          <span class="dash__label">Phantom Thief Rank</span>
+          <strong class="dash__rankTitle" id="rankTitle">Transfer Student</strong>
+          <span class="dash__rankBlurb" id="rankBlurb"></span>
+        </div>
+      </div>
+      <ul class="dash__counts" aria-label="Trophy counts">
+        <li class="chip chip--plat"><span class="chip__dot"></span><span class="chip__name">Platinum</span><b id="cnt-platinum">0/1</b></li>
+        <li class="chip chip--gold"><span class="chip__dot"></span><span class="chip__name">Gold</span><b id="cnt-gold">0/1</b></li>
+        <li class="chip chip--silver"><span class="chip__dot"></span><span class="chip__name">Silver</span><b id="cnt-silver">0/7</b></li>
+        <li class="chip chip--bronze"><span class="chip__dot"></span><span class="chip__name">Bronze</span><b id="cnt-bronze">0/44</b></li>
+      </ul>
+      <div class="dash__time">
+        <span class="dash__label">Est. time remaining</span>
+        <strong id="hoursLeft">~80–100 hrs</strong>
+        <span class="dash__total" id="totalDone">0 / 53 trophies</span>
+      </div>
+      <div class="dash__bar" aria-hidden="true"><span id="dashBar"></span></div>
+    </section>
+  </div>
+
+  <main>
+    <!-- ======================= MISSABLE ALERT ======================= -->
+    <aside class="alert" role="note" aria-label="Critical missable alert">
+      <div class="alert__tag">Critical · Missable</div>
+      <div class="alert__body">
+        <p><strong>Councillor (Takuto Maruki) to Rank 9 by 11/17</strong> (Rank 10 is automatic). Miss it and the Third Semester and the Platinum are gone for this run.</p>
+        <p class="alert__also">Also: <strong>Justice (Akechi) R8 by 11/17</strong> · <strong>Faith (Kasumi) R5 by 12/18</strong>. Recommended for the true ending.</p>
+      </div>
+      <a class="btn btn--light btn--sm" href="#third-semester">Full breakdown</a>
+    </aside>
+
+    <!-- ======================= ROADMAP ======================= -->
+    <section class="section" id="roadmap" aria-labelledby="roadmap-h">
+      <header class="section__head">
+        <span class="section__num">01</span>
+        <h2 class="section__title" id="roadmap-h">Roadmap</h2>
+        <p class="section__lede">One playthrough, eight checkpoints. Tick each phase off as you clear it.</p>
+      </header>
+
+      <div class="facts">
+        <div class="fact"><span>Difficulty</span><strong>Any</strong></div>
+        <div class="fact"><span>Playthroughs</span><strong>1 <small>(+NG+ cleanup if needed)</small></strong></div>
+        <div class="fact"><span>Time</span><strong>~80–100 hrs</strong></div>
+        <div class="fact"><span>Trophies</span><strong>53 <small>1P · 1G · 7S · 44B</small></strong></div>
+      </div>
+
+      <div class="callouts">
+        <article class="callout callout--dlc">
+          <h3 class="callout__title">PS5 DLC Note</h3>
+          <p>The PS5 version comes with nearly all previously released DLC. The <strong>cardboard box in Joker's attic</strong> (available from 4/12) gives you <strong>100,000+ yen</strong>, items, and <strong>overpowered DLC Personas</strong> that can be summoned for free. Claiming it is optional and can't be undone.</p>
+          <p>DLC Personas also take up level slots in their Arcana, so some <strong>standard Velvet Room fusion recipes shift slightly</strong>. If a guide's recipe gives you the wrong Persona, turn on the DLC toggle in your fusion calculator.</p>
+        </article>
+        <article class="callout callout--den">
+          <h3 class="callout__title">Thieves Den ≠ Trophies</h3>
+          <p>Thieves Den <strong>awards</strong> (paid out in P Medals) are an in-game achievement list and are <strong>separate from PlayStation trophies</strong>. Many awards overlap with trophy activities, though, so working through them moves your Platinum forward too.</p>
+        </article>
+      </div>
+
+      <ol class="timeline" id="roadmapList"><!-- rendered by app.js --></ol>
+    </section>
+
+    <!-- ======================= THIRD SEMESTER ======================= -->
+    <section class="section section--danger" id="third-semester" aria-labelledby="ts-h">
+      <header class="section__head">
+        <span class="section__num">02</span>
+        <h2 class="section__title" id="ts-h">Third Semester Unlock</h2>
+        <p class="section__lede">Required for <em>Take Back the Future</em> and therefore the Platinum. Spoiler-light.</p>
+      </header>
+
+      <div class="deadlines">
+        <article class="deadline deadline--must">
+          <div class="deadline__badge">Mandatory</div>
+          <div class="deadline__arcana">Councillor</div>
+          <h3 class="deadline__name">Takuto Maruki</h3>
+          <div class="deadline__goal"><span>Rank</span><strong>9</strong></div>
+          <div class="deadline__date">Before <strong>11/18</strong> <small>(last day: 11/17)</small></div>
+          <ul class="deadline__notes">
+            <li>Capped at Rank 5 until <strong>9/20</strong>. Get R5 early.</li>
+            <li>Rank 10 happens automatically.</li>
+            <li>Bring a Councillor Persona to every visit.</li>
+          </ul>
+        </article>
+        <article class="deadline deadline--rec">
+          <div class="deadline__badge">Strongly recommended</div>
+          <div class="deadline__arcana">Justice</div>
+          <h3 class="deadline__name">Goro Akechi</h3>
+          <div class="deadline__goal"><span>Rank</span><strong>8</strong></div>
+          <div class="deadline__date">Before <strong>11/18</strong> <small>(last day: 11/17)</small></div>
+          <ul class="deadline__notes">
+            <li>Does <strong>not</strong> rank up automatically in Royal.</li>
+            <li>Ranks 9 and 10 follow automatically if you make the deadline.</li>
+            <li>Needed for the true ending and extra scenes.</li>
+          </ul>
+        </article>
+        <article class="deadline deadline--rec">
+          <div class="deadline__badge">Strongly recommended</div>
+          <div class="deadline__arcana">Faith</div>
+          <h3 class="deadline__name">Kasumi Yoshizawa</h3>
+          <div class="deadline__goal"><span>Rank</span><strong>5</strong></div>
+          <div class="deadline__date">Before <strong>12/18</strong> <small>(some guides say 12/22)</small></div>
+          <ul class="deadline__notes">
+            <li>Lets you max her and romance her in the Third Semester.</li>
+            <li>Unlocks extra Third Semester content.</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="rule">
+        <span class="rule__icon" aria-hidden="true">✕</span>
+        <p><strong>Golden rule:</strong> refuse every deal or offer an antagonist makes you, before and during the Third Semester. Accepting one leads straight to a bad ending.</p>
+      </div>
+    </section>
+
+    <!-- ======================= TROPHY TRACKER ======================= -->
+    <section class="section" id="trophies" aria-labelledby="tt-h">
+      <header class="section__head">
+        <span class="section__num">03</span>
+        <h2 class="section__title" id="tt-h">Trophy Tracker</h2>
+        <p class="section__lede">Tap a calling card to mark it stolen. Progress saves automatically.</p>
+      </header>
+
+      <div class="toolbar">
+        <label class="search">
+          <span class="visually-hidden">Search trophies</span>
+          <input type="search" id="trophySearch" placeholder="Search trophies, tips, dates…" autocomplete="off" />
+        </label>
+
+        <div class="filters" role="group" aria-label="Filter by grade">
+          <span class="filters__label">Grade</span>
+          <button type="button" class="pill is-active" data-grade="all">All</button>
+          <button type="button" class="pill" data-grade="platinum">Platinum</button>
+          <button type="button" class="pill" data-grade="gold">Gold</button>
+          <button type="button" class="pill" data-grade="silver">Silver</button>
+          <button type="button" class="pill" data-grade="bronze">Bronze</button>
+        </div>
+
+        <div class="filters" role="group" aria-label="Filter by status">
+          <span class="filters__label">Status</span>
+          <button type="button" class="pill is-active" data-status="all">All</button>
+          <button type="button" class="pill" data-status="completed">Completed</button>
+          <button type="button" class="pill" data-status="remaining">Remaining</button>
+        </div>
+
+        <div class="filters" role="group" aria-label="Filter by tag" id="tagFilters"><!-- rendered by app.js --></div>
+
+        <div class="savebar">
+          <button type="button" class="btn btn--sm btn--ghost" id="exportBtn">⬇ Export save</button>
+          <label class="btn btn--sm btn--ghost" for="importFile">⬆ Import save</label>
+          <input type="file" id="importFile" accept="application/json,.json" hidden />
+          <button type="button" class="btn btn--sm btn--danger" id="resetBtn">Reset</button>
+        </div>
+      </div>
+
+      <p class="batchnote" id="batchNote" hidden></p>
+      <p class="resultcount" id="resultCount" aria-live="polite"></p>
+      <div class="trophygrid" id="trophyGrid"><!-- rendered by app.js --></div>
+    </section>
+
+    <!-- ======================= CLASSROOM ======================= -->
+    <section class="section" id="classroom" aria-labelledby="cl-h">
+      <header class="section__head">
+        <span class="section__num">04</span>
+        <h2 class="section__title" id="cl-h">Classroom &amp; Exam Answers</h2>
+        <p class="section__lede">Sorted by date. Type a date (<code>10/17</code>), keyword, or answer.</p>
+      </header>
+
+      <div class="toolbar toolbar--compact">
+        <label class="search">
+          <span class="visually-hidden">Search classroom answers</span>
+          <input type="search" id="classSearch" placeholder="e.g. 12/20, soccer, placebo…" autocomplete="off" />
+        </label>
+        <label class="select">
+          <span class="visually-hidden">Month</span>
+          <select id="classMonth"><option value="all">All months</option></select>
+        </label>
+        <button type="button" class="pill" id="examOnly" aria-pressed="false">Exams only</button>
+      </div>
+      <div class="answers" id="classList"><!-- rendered by app.js --></div>
+    </section>
+
+    <!-- ======================= CONFIDANTS ======================= -->
+    <section class="section" id="confidants" aria-labelledby="cf-h">
+      <header class="section__head">
+        <span class="section__num">05</span>
+        <h2 class="section__title" id="cf-h">Confidant Cheat Sheet</h2>
+        <p class="section__lede">Where to find everyone, who has a deadline, and how to rank up faster.</p>
+      </header>
+
+      <div class="callouts callouts--two">
+        <article class="callout callout--gold">
+          <h3 class="callout__title">Fortune: Affinity Reading</h3>
+          <ul class="ticks">
+            <li>Unlocks at <strong>Chihaya Rank 5</strong> and costs <strong>¥5,000</strong> (Shinjuku).</li>
+            <li>Pick a Confidant and Chihaya deepens your bond with them, so your next hangout counts for more.</li>
+            <li>Best on whoever is closest to a rank-up, especially <strong>Maruki and Akechi before 11/17</strong>.</li>
+          </ul>
+        </article>
+        <article class="callout callout--gold">
+          <h3 class="callout__title">Matching Arcana Bonus</h3>
+          <ul class="ticks">
+            <li>Carry a Persona of the <strong>same Arcana</strong> as the Confidant you're meeting for bonus points.</li>
+            <li>Higher-level Personas of that Arcana help more.</li>
+            <li>Visit the Velvet Room before a big hangout day to fuse the right Arcana.</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="toolbar toolbar--compact">
+        <label class="search">
+          <span class="visually-hidden">Search Confidants</span>
+          <input type="search" id="confSearch" placeholder="Search by name, Arcana, or location…" autocomplete="off" />
+        </label>
+        <button type="button" class="pill" id="confDeadline" aria-pressed="false">Deadlines only</button>
+        <button type="button" class="pill" id="confRomance" aria-pressed="false">Romanceable</button>
+      </div>
+      <div class="confgrid" id="confList"><!-- rendered by app.js --></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Fan-made companion for <strong>Persona 5 Royal</strong> (PS5). Not affiliated with ATLUS or SEGA. Progress is stored only in this browser. Use Export to back it up.</p>
+    <a class="btn btn--sm btn--ghost" href="#top">Back to top ▲</a>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="trophies.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
