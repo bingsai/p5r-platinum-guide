@@ -27,7 +27,7 @@
   }
 
   /* ================================================================ STATE */
-  const defaultState = () => ({ version: SAVE_VERSION, trophies: {}, roadmap: {}, revealed: {}, shield: true, theme: 'dark' });
+  const defaultState = () => ({ version: SAVE_VERSION, trophies: {}, roadmap: {}, days: {}, revealed: {}, shield: true, theme: 'dark' });
   let state = loadState();
 
   function loadState() {
@@ -44,6 +44,7 @@
     };
     s.trophies = copy(raw.trophies, v => v === true || typeof v === 'string');
     s.roadmap = copy(raw.roadmap, v => v === true);
+    s.days = copy(raw.days, v => v === true);
     s.revealed = copy(raw.revealed, v => v === true);
     s.shield = raw.shield !== false;
     s.theme = raw.theme === 'light' ? 'light' : 'dark';
@@ -54,7 +55,7 @@
     catch (e) { toast('Couldn\'t save. Browser storage may be full or switched off.'); }
   }
 
-  const ui = { grade: 'all', status: 'all', tags: new Set(), query: '', classQuery: '', classMonth: 'all', examOnly: false, confQuery: '', confDeadline: false, confRomance: false };
+  const ui = { plannerMonth: null, plannerKey: false, plannerHideDone: false, grade: 'all', status: 'all', tags: new Set(), query: '', classQuery: '', classMonth: 'all', examOnly: false, confQuery: '', confDeadline: false, confRomance: false };
 
   let toastTimer;
   function toast(msg) {
@@ -429,6 +430,116 @@
     if (nowDone) toast('Phase cleared!');
   }
 
+  /* ================================================================ DAILY PLANNER */
+  const MONTHS = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February'];
+  const MONTH_NUM = { April: 4, May: 5, June: 6, July: 7, August: 8, September: 9, October: 10, November: 11, December: 12, January: 1, February: 2 };
+  const WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const monthOf = (d) => MONTHS.find(m => MONTH_NUM[m] === Number(d.split('/')[0]));
+  function weekday(d) {
+    const [m, day] = d.split('/').map(Number);
+    return new Date(m >= 4 ? 2016 : 2017, m - 1, day).getDay();
+  }
+  const isKeyDay = (x) => (x.k || []).some(f => f === 'deadline' || f === 'palace' || f === 'exam' || f === 'key') || (x.tr && x.tr.length);
+
+  function trophyChip(name) {
+    const t = P5R.trophies.find(tt => tt.name === name);
+    const earned = t && state.trophies[t.id];
+    if (t && isShielded(t)) return `<span class="tchip tchip--hidden ${earned ? 'is-earned' : ''}"><span>★ Spoiler trophy</span></span>`;
+    return `<span class="tchip ${earned ? 'is-earned' : ''}"><span>★ ${escapeHTML(name)}</span></span>`;
+  }
+
+  function renderPlanner(justDone) {
+    const plan = P5R.planner || [];
+    if (!plan.length) return;
+    if (!ui.plannerMonth) {
+      const next = plan.find(x => !state.days[x.d]) || plan[plan.length - 1];
+      ui.plannerMonth = monthOf(next.d);
+    }
+    $('#plannerMonths').innerHTML = MONTHS.map(m => {
+      const days = plan.filter(x => monthOf(x.d) === m);
+      if (!days.length) return '';
+      const done = days.filter(x => state.days[x.d]).length;
+      const deadline = days.some(x => (x.k || []).includes('deadline'));
+      const sel = m === ui.plannerMonth;
+      return `<button type="button" role="tab" class="month-tab ${deadline ? 'has-deadline' : ''}" data-month="${m}" aria-selected="${sel}" style="--done:${Math.round(done / days.length * 100)}%">
+        ${m.slice(0, 3)}<small>${done}/${days.length}</small><i></i></button>`;
+    }).join('');
+
+    $('#plannerIntro').textContent = (P5R.plannerNotes || {})[ui.plannerMonth] || '';
+
+    const list = plan.filter(x => monthOf(x.d) === ui.plannerMonth)
+      .filter(x => !ui.plannerKey || isKeyDay(x))
+      .filter(x => !ui.plannerHideDone || !state.days[x.d]);
+
+    $('#plannerList').innerHTML = list.length ? list.map((x, i) => {
+      const k = x.k || [];
+      const wd = weekday(x.d);
+      const done = !!state.days[x.d];
+      const auto = k.includes('auto') && !k.some(f => f !== 'auto');
+      const flags = [
+        k.includes('deadline') ? '<span class="flag flag--deadline">Deadline</span>' : '',
+        k.includes('palace') ? '<span class="flag flag--palace">Palace</span>' : '',
+        k.includes('exam') ? '<span class="flag flag--exam">Exam</span>' : '',
+        k.includes('key') ? '<span class="flag flag--key">Important</span>' : '',
+        k.includes('auto') ? '<span class="flag">Story</span>' : ''
+      ].join('');
+      const cls = ['day', done ? 'is-done' : '', justDone === x.d ? 'just-done' : '', auto ? 'day--auto' : '',
+        k.includes('deadline') ? 'day--deadline' : '', k.includes('palace') ? 'day--palace' : '',
+        wd === 0 ? 'day--sun' : '', wd === 6 ? 'day--sat' : ''].join(' ');
+      return `
+        <li class="${cls}" data-day="${escapeHTML(x.d)}" id="day-${x.d.replace('/', '-')}" style="animation-delay:${Math.min(i * 25, 500)}ms">
+          <div class="day__date">
+            <span class="day__num">${escapeHTML(x.d)}</span>
+            <span class="day__wd">${WD[wd]}</span>
+            <button class="day__check" type="button" aria-pressed="${done}" aria-label="Mark ${escapeHTML(x.d)} as ${done ? 'not played' : 'played'}"><span>✓</span></button>
+          </div>
+          <div class="day__body">
+            ${flags ? `<div class="day__flags">${flags}</div>` : ''}
+            <div class="slot"><span class="slot__k">Daytime</span><p>${escapeHTML(x.day)}</p></div>
+            <div class="slot slot--eve"><span class="slot__k">Evening</span><p>${escapeHTML(x.eve)}</p></div>
+            ${x.tr && x.tr.length ? `<div class="day__trophies">${x.tr.map(trophyChip).join('')}</div>` : ''}
+          </div>
+        </li>`;
+    }).join('') : `<li class="empty"><strong>Nothing to show</strong>Every day here is finished or filtered out. Turn off a filter to see them.</li>`;
+  }
+
+  function onPlannerClick(e) {
+    const btn = e.target.closest('.day__check');
+    if (!btn) return;
+    const d = btn.closest('.day').dataset.day;
+    const nowDone = !state.days[d];
+    if (nowDone) state.days[d] = true; else delete state.days[d];
+    save();
+    if (nowDone) {
+      const r = btn.getBoundingClientRect();
+      FX.burst(r.left + r.width / 2, r.top + r.height / 2, 26, { speed: 7, size: 6, lift: 2 });
+    }
+    renderPlanner(nowDone ? d : null);
+    const again = $(`.day[data-day="${CSS.escape(d)}"] .day__check`);
+    if (again) again.focus({ preventScroll: true });
+    const plan = P5R.planner || [];
+    const m = monthOf(d);
+    if (nowDone && plan.filter(x => monthOf(x.d) === m).every(x => state.days[x.d])) {
+      cutin({ grade: 'gold', label: `${m} cleared` });
+    }
+  }
+
+  function jumpToDay(d) {
+    const entry = (P5R.planner || []).find(x => x.d === d);
+    if (!entry) return false;
+    ui.plannerMonth = monthOf(d);
+    ui.plannerHideDone = false; $('#plannerHideDone').setAttribute('aria-pressed', 'false');
+    ui.plannerKey = false; $('#plannerKey').setAttribute('aria-pressed', 'false');
+    renderPlanner();
+    const el = document.getElementById('day-' + d.replace('/', '-'));
+    if (el) {
+      const y = el.getBoundingClientRect().top + scrollY - ($('#sitebar').offsetHeight + 24);
+      window.scrollTo({ top: y, behavior: REDUCED ? 'auto' : 'smooth' });
+      el.classList.remove('is-target'); void el.offsetWidth; el.classList.add('is-target');
+    }
+    return true;
+  }
+
   /* ================================================================ TROPHY TRACKER */
   function renderTagFilters() {
     $('#tagFilters').innerHTML = '<span class="filters__label">Tags</span>' + P5R.TAGS.map(tag =>
@@ -518,6 +629,7 @@
       }
     }
     updateDashboard();
+    renderPlanner();
 
     if (nowDone) cutin({ grade: t.grade, label: isShielded(t) ? `Spoiler trophy #${t.num}` : t.name });
     if (platJust) cutin({ grade: 'platinum', label: platinum().name });
@@ -584,7 +696,7 @@
   }
   function resetProgress() {
     if (!window.confirm('Reset all trophy and roadmap progress? Export a save first if you might want it back.')) return;
-    state.trophies = {}; state.roadmap = {}; state.revealed = {};
+    state.trophies = {}; state.roadmap = {}; state.days = {}; state.revealed = {};
     save(); renderAll();
     toast('Progress reset. Fresh calendar.');
   }
@@ -648,7 +760,7 @@
   /* ================================================================ NAV: active section + mobile drawer */
   function initActiveNav() {
     if (!('IntersectionObserver' in window)) return;
-    const ids = ['overview', 'roadmap', 'third-semester', 'trophies', 'classroom', 'confidants'];
+    const ids = ['overview', 'roadmap', 'third-semester', 'planner', 'trophies', 'classroom', 'confidants'];
     const io = new IntersectionObserver(entries => {
       entries.forEach(en => {
         if (!en.isIntersecting) return;
@@ -684,7 +796,7 @@
     $('#spoilerToggle').addEventListener('click', () => {
       state.shield = !state.shield;
       if (state.shield) state.revealed = {};
-      save(); applyShieldButton(); renderTrophies();
+      save(); applyShieldButton(); renderTrophies(); renderPlanner();
       toast(state.shield ? 'Spoiler Shield on' : 'Spoiler Shield off: every trophy is visible');
     });
 
@@ -714,6 +826,24 @@
     $('#confDeadline').addEventListener('click', e => { ui.confDeadline = !ui.confDeadline; e.currentTarget.setAttribute('aria-pressed', String(ui.confDeadline)); renderConfidants(); });
     $('#confRomance').addEventListener('click', e => { ui.confRomance = !ui.confRomance; e.currentTarget.setAttribute('aria-pressed', String(ui.confRomance)); renderConfidants(); });
 
+    $('#plannerMonths').addEventListener('click', e => {
+      const b = e.target.closest('[data-month]');
+      if (!b) return;
+      ui.plannerMonth = b.dataset.month; renderPlanner();
+    });
+    $('#plannerList').addEventListener('click', onPlannerClick);
+    $('#plannerKey').addEventListener('click', e => { ui.plannerKey = !ui.plannerKey; e.currentTarget.setAttribute('aria-pressed', String(ui.plannerKey)); renderPlanner(); });
+    $('#plannerHideDone').addEventListener('click', e => { ui.plannerHideDone = !ui.plannerHideDone; e.currentTarget.setAttribute('aria-pressed', String(ui.plannerHideDone)); renderPlanner(); });
+    $('#plannerResume').addEventListener('click', () => {
+      const next = (P5R.planner || []).find(x => !state.days[x.d]);
+      if (next) jumpToDay(next.d); else toast('Every day is ticked off. The show is over!');
+    });
+    $('#plannerJump').addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      const v = e.target.value.trim().replace(/^0/, '').replace(/\/0/, '/');
+      if (!jumpToDay(v)) toast(`No entry for ${v}. Use the in-game format, such as 11/17. 12/25–12/30 are skipped by the story.`);
+    });
+
     $('#tocBtn').addEventListener('click', () => ($('#toc').classList.contains('is-open') ? closeToc() : openToc()));
     $('#tocScrim').addEventListener('click', closeToc);
     $('#cutin').addEventListener('click', endCutin);
@@ -724,7 +854,7 @@
 
   function renderAll() {
     applyTheme(); applyShieldButton();
-    renderRoadmap(); renderTagFilters(); renderTrophies(); updateDashboard();
+    renderRoadmap(); renderPlanner(); renderTagFilters(); renderTrophies(); updateDashboard();
     renderClassroom(); renderConfidants();
   }
 

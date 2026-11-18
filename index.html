@@ -61,6 +61,7 @@
       <nav class="jumpnav" aria-label="Jump to section">
         <a href="#roadmap" data-nav="roadmap">Roadmap</a>
         <a href="#third-semester" data-nav="third-semester">Third Semester Unlock</a>
+        <a href="#planner" data-nav="planner">Daily Planner</a>
         <a href="#trophies" data-nav="trophies">Trophy Tracker</a>
         <a href="#classroom" data-nav="classroom">Classroom Answers</a>
         <a href="#confidants" data-nav="confidants">Confidant Cheat Sheet</a>
@@ -112,6 +113,7 @@
           <li><a href="#overview" data-nav="overview">Overview</a></li>
           <li><a href="#roadmap" data-nav="roadmap">Roadmap</a></li>
           <li><a href="#third-semester" data-nav="third-semester">Third Semester Unlock</a></li>
+          <li><a href="#planner" data-nav="planner">Daily Planner</a></li>
           <li><a href="#trophies" data-nav="trophies">Trophy Tracker</a></li>
           <li><a href="#classroom" data-nav="classroom">Classroom &amp; Exam Answers</a></li>
           <li><a href="#confidants" data-nav="confidants">Confidant Cheat Sheet</a></li>
@@ -137,6 +139,7 @@
           <ul>
             <li><a href="#roadmap">Month-by-month roadmap</a> with a checkbox for each phase</li>
             <li><a href="#third-semester">The three Confidant deadlines</a> for the Third Semester and true ending</li>
+            <li><a href="#planner">A day-by-day planner</a> covering every in-game day from 4/9 to 2/3</li>
             <li><a href="#trophies">Interactive trophy tracker</a> with spoiler shield, filters and save backups</li>
             <li><a href="#classroom">Every classroom and exam answer</a>, searchable by date</li>
             <li><a href="#confidants">Where to find every Confidant</a> and how to rank them faster</li>
@@ -226,6 +229,36 @@
           <span class="rule__x" aria-hidden="true">✕</span>
           <p><strong>Refuse every deal an antagonist offers you,</strong> before and during the Third Semester. Saying yes sends you straight to a bad ending.</p>
         </div>
+      </section>
+
+      <!-- DAILY PLANNER -->
+      <section class="sec" id="planner" aria-labelledby="dp-h">
+        <h2 class="sec__title" id="dp-h" data-ransom>Daily Planner</h2>
+        <p class="lead">What to do with every in-game day, from the first morning to the final boss. It's built to hit every deadline and pick up trophies along the way. Tick off each day as you play it and the planner remembers where you are.</p>
+
+        <div class="note note--gold planner__how">
+          <h3 class="note__title">How to use it</h3>
+          <ul class="ticks">
+            <li>Each day has a daytime plan (after school, or all day on holidays) and an evening plan.</li>
+            <li>For every Confidant hangout, carry a Persona of their Arcana. It's assumed throughout.</li>
+            <li>Class and exam answers live in the <a href="#classroom">Classroom Answers</a> section.</li>
+            <li>Off by a day? Rank-up dates shift if you miss a point threshold. Do the next listed hangout and carry on. Only the red deadline days are fixed.</li>
+          </ul>
+        </div>
+
+        <div class="toolbar toolbar--compact planner__bar">
+          <div class="months" id="plannerMonths" role="tablist" aria-label="Month"></div>
+          <label class="search search--date">
+            <span class="visually-hidden">Jump to date</span>
+            <input type="search" id="plannerJump" placeholder="Jump to a date, e.g. 11/17" autocomplete="off" inputmode="numeric" />
+          </label>
+          <button type="button" class="pill" id="plannerKey" aria-pressed="false">Key days only</button>
+          <button type="button" class="pill" id="plannerHideDone" aria-pressed="false">Hide finished days</button>
+          <button type="button" class="btn btn--sm btn--red" id="plannerResume">Continue where I left off</button>
+        </div>
+        <p class="planner__intro" id="plannerIntro"></p>
+        <ol class="days" id="plannerList"></ol>
+        <p class="planner__credit">Compiled from several published day-by-day schedules (bai-gaming's Platinum guide, TheGamer's 100% walkthrough, Samurai Gamers) and rewritten spoiler-light.</p>
       </section>
 
       <!-- TROPHY TRACKER -->
@@ -372,6 +405,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="trophies.js"></script>
+  <script src="planner.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
