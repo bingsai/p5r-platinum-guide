@@ -45,6 +45,7 @@
     s.trophies = copy(raw.trophies, v => v === true || typeof v === 'string');
     s.roadmap = copy(raw.roadmap, v => v === true);
     s.days = copy(raw.days, v => v === true);
+    s.daySync = raw.daySync === true;
     s.revealed = copy(raw.revealed, v => v === true);
     s.shield = raw.shield !== false;
     s.theme = raw.theme === 'light' ? 'light' : 'dark';
@@ -443,9 +444,11 @@
 
   function trophyChip(name) {
     const t = P5R.trophies.find(tt => tt.name === name);
-    const earned = t && state.trophies[t.id];
-    if (t && isShielded(t)) return `<span class="tchip tchip--hidden ${earned ? 'is-earned' : ''}"><span>★ Spoiler trophy</span></span>`;
-    return `<span class="tchip ${earned ? 'is-earned' : ''}"><span>★ ${escapeHTML(name)}</span></span>`;
+    if (!t) return `<span class="tchip tchip--pending" title="This trophy is added to the tracker in the next batch"><span>★ ${escapeHTML(name)}</span></span>`;
+    const earned = !!state.trophies[t.id];
+    const label = isShielded(t) ? 'Spoiler trophy' : name;
+    const locked = t.grade === 'platinum';
+    return `<button type="button" class="tchip ${earned ? 'is-earned' : ''} ${isShielded(t) ? 'tchip--hidden' : ''}" data-trophy="${escapeHTML(t.id)}" aria-pressed="${earned}" ${locked ? 'disabled title="Unlocks on its own once the other 52 are done"' : `title="${earned ? 'Earned. Tap to unmark' : 'Tap to mark as earned'}"`}><span>${earned ? '✓' : '★'} ${escapeHTML(label)}</span></button>`;
   }
 
   function renderPlanner(justDone) {
@@ -503,13 +506,41 @@
     }).join('') : `<li class="empty"><strong>Nothing to show</strong>Every day here is finished or filtered out. Turn off a filter to see them.</li>`;
   }
 
+  /** Story trophies can't be missed on the day they're listed, so ticking that day awards them. */
+  function awardDayTrophies(d) {
+    const entry = (P5R.planner || []).find(x => x.d === d);
+    const won = [];
+    (entry && entry.tr || []).forEach(name => {
+      const t = P5R.trophies.find(tt => tt.name === name);
+      if (t && t.grade !== 'platinum' && (t.tags || []).includes('Story') && !state.trophies[t.id]) {
+        state.trophies[t.id] = new Date().toISOString();
+        won.push(t);
+      }
+    });
+    return won;
+  }
+
   function onPlannerClick(e) {
+    const chip = e.target.closest('.tchip[data-trophy]');
+    if (chip && !chip.disabled) { toggleTrophy(chip.dataset.trophy); return; }
     const btn = e.target.closest('.day__check');
     if (!btn) return;
     const d = btn.closest('.day').dataset.day;
     const nowDone = !state.days[d];
     if (nowDone) state.days[d] = true; else delete state.days[d];
+    const won = nowDone ? awardDayTrophies(d) : [];
+    const platJust = won.length ? syncPlatinum() : false;
     save();
+    if (won.length) {
+      renderTrophies(); updateDashboard();
+      won.forEach(t => cutin({ grade: t.grade, label: isShielded(t) ? `Spoiler trophy #${t.num}` : t.name }));
+      if (platJust) cutin({ grade: 'platinum', label: platinum().name });
+    } else if (nowDone) {
+      const entry = (P5R.planner || []).find(x => x.d === d);
+      if (entry && entry.tr && entry.tr.some(n => { const t = P5R.trophies.find(tt => tt.name === n); return t && !state.trophies[t.id]; })) {
+        toast('Got a trophy today? Tap it on the day card to mark it earned.');
+      }
+    }
     if (nowDone) {
       const r = btn.getBoundingClientRect();
       FX.burst(r.left + r.width / 2, r.top + r.height / 2, 26, { speed: 7, size: 6, lift: 2 });
@@ -938,6 +969,11 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     runIntro();
+    if (!state.daySync) {
+      Object.keys(state.days).forEach(awardDayTrophies);
+      state.daySync = true;
+      save();
+    }
     syncPlatinum();
     initClassroom();
     initRansom();

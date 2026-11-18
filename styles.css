@@ -591,7 +591,11 @@ mark { background: var(--gold); color: #000; padding: 0 .1em; }
 .day__trophies { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .55rem; }
 .tchip { display: inline-flex; align-items: center; gap: .35rem; font-size: .82rem; font-weight: 700; padding: .1rem .55rem; background: var(--gold); color: #000; transform: skewX(var(--skew)); }
 .tchip > * { transform: skewX(var(--unskew)); }
-.tchip.is-earned { background: var(--panel-2); color: var(--muted); text-decoration: line-through; }
+.tchip { border: 0; cursor: pointer; font-family: var(--body); transition: transform .2s var(--pop), background-color .15s; }
+.tchip:hover:not(:disabled) { transform: skewX(var(--skew)) translateY(-2px) scale(1.05); }
+.tchip:disabled { cursor: default; }
+.tchip.is-earned { background: var(--red); color: #fff; }
+.tchip--pending { background: transparent; color: var(--muted); border: 1.5px dashed var(--line); cursor: help; }
 .tchip--hidden { background: #000; color: var(--gold); border: 1.5px solid var(--gold); }
 .day.is-target { animation: target 1.6s var(--pop); }
 @keyframes target { 0%, 60% { box-shadow: 0 0 0 4px var(--gold), 10px 10px 0 var(--red); transform: scale(1.02); } }
