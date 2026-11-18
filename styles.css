@@ -601,6 +601,48 @@ mark { background: var(--gold); color: #000; padding: 0 .1em; }
   .slot { grid-template-columns: 1fr; gap: .1rem; }
 }
 
+
+/* ================================================================ WEAKNESS COMPENDIUM */
+.wk-tabs { display: flex; gap: .4rem; margin-bottom: .8rem; }
+.wk-tab {
+  border: 3px solid var(--text); background: var(--panel); padding: .45rem 1.2rem; cursor: pointer;
+  font-family: var(--display); font-size: 1.3rem; text-transform: uppercase; transform: skewX(var(--skew));
+  transition: transform .2s var(--pop), background-color .15s;
+}
+.wk-tab small { font-family: var(--body); font-size: .8rem; font-weight: 700; margin-left: .3rem; color: var(--muted); }
+.wk-tab:hover { transform: skewX(var(--skew)) translateY(-3px); }
+.wk-tab[aria-selected="true"] { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 5px 5px 0 var(--text); }
+.wk-tab[aria-selected="true"] small { color: #ffd9df; }
+.wk-elems { flex-basis: 100%; }
+.wk-elems .pill { min-width: 3.4rem; }
+.wk-legend { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; margin: 0 0 .8rem; font-size: .88rem; color: var(--muted); }
+.wk-legend span { display: inline-flex; align-items: center; gap: .4rem; }
+.wk-wrap { overflow-x: auto; border: 2px solid var(--line); background: var(--panel); max-height: 78vh; overflow-y: auto; }
+.wk-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.wk-table th { position: sticky; top: 0; z-index: 2; background: #000; color: #fff; padding: .55rem .3rem; font-family: var(--display); font-weight: 400; font-size: .95rem; letter-spacing: .03em; text-transform: uppercase; text-align: center; white-space: nowrap; }
+.wk-table th:first-child { text-align: left; padding-left: .8rem; left: 0; z-index: 3; }
+.wk-table th.is-hot { background: var(--red); }
+.wk-table td { padding: .4rem .25rem; border-bottom: 1px solid var(--line); text-align: center; }
+.wk-table td:first-child { position: sticky; left: 0; z-index: 1; background: var(--panel); text-align: left; padding: .45rem .8rem; min-width: 210px; border-right: 2px solid var(--line); }
+.wk-table tr:nth-child(even) td { background: var(--panel-2); }
+.wk-table tr:hover td { background: color-mix(in srgb, var(--red) 14%, var(--panel)); }
+.wk-name { display: block; font-weight: 700; line-height: 1.25; }
+.wk-sub { display: block; font-size: .8rem; color: var(--muted); }
+.wk-dlc { display: inline-block; margin-left: .35rem; font-size: .68rem; font-weight: 700; background: var(--gold); color: #000; padding: 0 .35rem; transform: skewX(var(--skew)); vertical-align: middle; }
+.aff { display: inline-grid; place-items: center; min-width: 2.3rem; height: 1.6rem; padding: 0 .25rem; font-weight: 700; font-size: .8rem; transform: skewX(var(--skew)); }
+.aff--w { background: var(--red); color: #fff; box-shadow: 2px 2px 0 #000; }
+.aff--s { background: #6b6b76; color: #fff; }
+.aff--n { background: #2b5fd9; color: #fff; }
+.aff--r { background: #7c3aed; color: #fff; }
+.aff--d { background: #0f9d58; color: #fff; }
+.aff--x { color: var(--line); }
+.wk-table td.is-hot { background: color-mix(in srgb, var(--gold) 16%, var(--panel)) !important; }
+.wk-table tr.is-pop td { animation: dropIn .35s var(--pop) both; }
+@media (max-width: 600px) {
+  .wk-table td:first-child { min-width: 150px; }
+  .aff { min-width: 1.9rem; }
+}
+
 /* ================================================================ RIGHT RAIL */
 .rail { position: sticky; top: calc(var(--bar-h) + 1.5rem); margin-top: 2rem; }
 .rail__inner { display: grid; gap: 1rem; }
@@ -648,6 +690,10 @@ mark { background: var(--gold); color: #000; padding: 0 .1em; }
 /* ================================================================ RESPONSIVE */
 @media (max-width: 1560px) {
   .iconbtn__label { display: none; }
+  .jumpnav a { padding: .5rem .55rem; font-size: .88rem; }
+}
+@media (min-width: 861px) and (max-width: 1640px) {
+  .mini { display: none; }
 }
 @media (max-width: 1320px) {
   .layout { grid-template-columns: 220px minmax(0, 1fr) 270px; gap: 2rem; }

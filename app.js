@@ -55,7 +55,7 @@
     catch (e) { toast('Couldn\'t save. Browser storage may be full or switched off.'); }
   }
 
-  const ui = { plannerMonth: null, plannerKey: false, plannerHideDone: false, grade: 'all', status: 'all', tags: new Set(), query: '', classQuery: '', classMonth: 'all', examOnly: false, confQuery: '', confDeadline: false, confRomance: false };
+  const ui = { wkTab: 'shadows', wkQuery: '', wkGroup: 'all', wkElems: new Set(), wkHideDlc: false, plannerMonth: null, plannerKey: false, plannerHideDone: false, grade: 'all', status: 'all', tags: new Set(), query: '', classQuery: '', classMonth: 'all', examOnly: false, confQuery: '', confDeadline: false, confRomance: false };
 
   let toastTimer;
   function toast(msg) {
@@ -757,10 +757,69 @@
       : `<div class="empty"><strong>No Confidants found</strong>Try an Arcana like Justice or a place like Shinjuku.</div>`;
   }
 
+  /* ================================================================ WEAKNESS COMPENDIUM */
+  const AFF = { w: ['Wk', 'Weak'], s: ['Rs', 'Resist'], n: ['Nu', 'Null'], r: ['Rp', 'Repel'], d: ['Dr', 'Drain'] };
+  const arcanaName = (a) => (a === 'Hanged' ? 'Hanged Man' : a);
+  const PALACE_ORDER = ['Palace 1', 'Palace 2', 'Palace 3', 'Palace 4', 'Palace 5', 'Palace 6', 'Palace 7', 'Third Semester Palace', 'Mementos depths', 'Final area'];
+
+  function renderWeaknesses(tabChanged) {
+    const EL = P5R.ELEMENTS;
+    if (!EL || !P5R.personas) return;
+    const isShadow = ui.wkTab === 'shadows';
+    $('#wkCountShadows').textContent = P5R.shadows.length;
+    $('#wkCountPersonas').textContent = P5R.personas.length;
+    $('#wkDlc').hidden = isShadow;
+
+    const sel = $('#wkGroup');
+    if (tabChanged || !sel.options.length) {
+      const groups = isShadow
+        ? [...new Set(P5R.shadows.map(s => s[4]))].sort((a, b) => {
+            const ia = PALACE_ORDER.indexOf(a), ib = PALACE_ORDER.indexOf(b);
+            return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.localeCompare(b);
+          })
+        : [...new Set(P5R.personas.map(p => p[1]))].sort();
+      sel.innerHTML = `<option value="all">${isShadow ? 'All areas' : 'All Arcana'}</option>` +
+        groups.map(g => `<option value="${escapeHTML(g)}">${escapeHTML(isShadow ? g : arcanaName(g))}</option>`).join('');
+      sel.value = 'all';
+    }
+    $('#wkElems').innerHTML = '<span class="filters__label">Weak to</span>' + EL.map((n, i) =>
+      `<button type="button" class="pill ${ui.wkElems.has(i) ? 'is-active' : ''}" data-elem="${i}" aria-pressed="${ui.wkElems.has(i)}">${n}</button>`).join('');
+
+    const q = ui.wkQuery.toLowerCase();
+    const rows = (isShadow ? P5R.shadows : P5R.personas).filter(r => {
+      const aff = isShadow ? r[5] : r[3];
+      if (ui.wkGroup !== 'all' && (isShadow ? r[4] : r[1]) !== ui.wkGroup) return false;
+      if (!isShadow && ui.wkHideDlc && r[5]) return false;
+      if (ui.wkElems.size && ![...ui.wkElems].some(i => aff[i] === 'w')) return false;
+      if (q) {
+        const hay = (isShadow ? [r[0], r[1], r[2], r[4]] : [r[0], r[1], arcanaName(r[1]), r[6], r[7]]).join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+
+    $('#wkResult').textContent = `Showing ${rows.length} of ${(isShadow ? P5R.shadows : P5R.personas).length} ${isShadow ? 'Shadows' : 'Personas'}`;
+    const head = `<thead><tr><th scope="col">${isShadow ? 'Shadow' : 'Persona'}</th>${EL.map((n, i) => `<th scope="col" class="${ui.wkElems.has(i) ? 'is-hot' : ''}">${n}</th>`).join('')}</tr></thead>`;
+    const body = rows.map((r, idx) => {
+      const aff = isShadow ? r[5] : r[3];
+      const sub = isShadow
+        ? `Lv ${r[3]} · ${escapeHTML(arcanaName(r[2]))} · ${escapeHTML(r[4])}<br>Persona: ${highlight(r[1], ui.wkQuery)}`
+        : `Lv ${r[2]} · ${highlight(arcanaName(r[1]), ui.wkQuery)}${r[6] ? ` · ${escapeHTML(r[6])}` : ''}`;
+      const cells = [...aff].map((c, i) => {
+        const a = AFF[c];
+        const hot = ui.wkElems.has(i) ? ' class="is-hot"' : '';
+        return a ? `<td${hot}><b class="aff aff--${c}" title="${EL[i]}: ${a[1]}">${a[0]}</b></td>`
+                 : `<td${hot}><span class="aff aff--x" aria-label="${EL[i]}: neutral">·</span></td>`;
+      }).join('');
+      return `<tr class="${idx < 30 ? 'is-pop' : ''}" style="${idx < 30 ? `animation-delay:${idx * 15}ms` : ''}"><td><span class="wk-name">${highlight(r[0], ui.wkQuery)}${!isShadow && r[5] ? '<span class="wk-dlc">DLC</span>' : ''}</span><span class="wk-sub">${sub}</span></td>${cells}</tr>`;
+    }).join('');
+    $('#wkTable').innerHTML = head + `<tbody>${body || `<tr><td colspan="11" class="empty"><strong>No matches</strong>Clear a filter or the search box.</td></tr>`}</tbody>`;
+  }
+
   /* ================================================================ NAV: active section + mobile drawer */
   function initActiveNav() {
     if (!('IntersectionObserver' in window)) return;
-    const ids = ['overview', 'roadmap', 'third-semester', 'planner', 'trophies', 'classroom', 'confidants'];
+    const ids = ['overview', 'roadmap', 'third-semester', 'planner', 'trophies', 'classroom', 'confidants', 'weaknesses'];
     const io = new IntersectionObserver(entries => {
       entries.forEach(en => {
         if (!en.isIntersecting) return;
@@ -844,6 +903,23 @@
       if (!jumpToDay(v)) toast(`No entry for ${v}. Use the in-game format, such as 11/17. 12/25–12/30 are skipped by the story.`);
     });
 
+    $$('.wk-tab').forEach(b => b.addEventListener('click', () => {
+      ui.wkTab = b.dataset.wktab; ui.wkGroup = 'all';
+      $$('.wk-tab').forEach(t => t.setAttribute('aria-selected', String(t === b)));
+      renderWeaknesses(true);
+    }));
+    let wt;
+    $('#wkSearch').addEventListener('input', e => { clearTimeout(wt); wt = setTimeout(() => { ui.wkQuery = e.target.value.trim(); renderWeaknesses(); }, 120); });
+    $('#wkGroup').addEventListener('change', e => { ui.wkGroup = e.target.value; renderWeaknesses(); });
+    $('#wkDlc').addEventListener('click', e => { ui.wkHideDlc = !ui.wkHideDlc; e.currentTarget.setAttribute('aria-pressed', String(ui.wkHideDlc)); renderWeaknesses(); });
+    $('#wkElems').addEventListener('click', e => {
+      const b = e.target.closest('[data-elem]');
+      if (!b) return;
+      const i = Number(b.dataset.elem);
+      ui.wkElems.has(i) ? ui.wkElems.delete(i) : ui.wkElems.add(i);
+      renderWeaknesses();
+    });
+
     $('#tocBtn').addEventListener('click', () => ($('#toc').classList.contains('is-open') ? closeToc() : openToc()));
     $('#tocScrim').addEventListener('click', closeToc);
     $('#cutin').addEventListener('click', endCutin);
@@ -855,7 +931,7 @@
   function renderAll() {
     applyTheme(); applyShieldButton();
     renderRoadmap(); renderPlanner(); renderTagFilters(); renderTrophies(); updateDashboard();
-    renderClassroom(); renderConfidants();
+    renderClassroom(); renderConfidants(); renderWeaknesses();
   }
 
   P5R.onDataChanged = () => { syncPlatinum(); renderTrophies(); updateDashboard(); };

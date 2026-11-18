@@ -65,6 +65,7 @@
         <a href="#trophies" data-nav="trophies">Trophy Tracker</a>
         <a href="#classroom" data-nav="classroom">Classroom Answers</a>
         <a href="#confidants" data-nav="confidants">Confidant Cheat Sheet</a>
+        <a href="#weaknesses" data-nav="weaknesses">Weaknesses</a>
       </nav>
       <div class="mini" title="Platinum progress">
         <span class="mini__pct" id="miniPct">0%</span>
@@ -117,6 +118,7 @@
           <li><a href="#trophies" data-nav="trophies">Trophy Tracker</a></li>
           <li><a href="#classroom" data-nav="classroom">Classroom &amp; Exam Answers</a></li>
           <li><a href="#confidants" data-nav="confidants">Confidant Cheat Sheet</a></li>
+          <li><a href="#weaknesses" data-nav="weaknesses">Weaknesses &amp; Resistances</a></li>
         </ol>
         <div class="toc__save">
           <p class="toc__head">Your save</p>
@@ -143,6 +145,7 @@
             <li><a href="#trophies">Interactive trophy tracker</a> with spoiler shield, filters and save backups</li>
             <li><a href="#classroom">Every classroom and exam answer</a>, searchable by date</li>
             <li><a href="#confidants">Where to find every Confidant</a> and how to rank them faster</li>
+            <li><a href="#weaknesses">Weaknesses and resistances</a> for all 232 Personas and 129 named Shadows</li>
           </ul>
         </div>
 
@@ -352,6 +355,43 @@
         <div class="confgrid" id="confList"></div>
       </section>
 
+      <!-- WEAKNESSES -->
+      <section class="sec" id="weaknesses" aria-labelledby="wk-h">
+        <h2 class="sec__title" id="wk-h" data-ransom>Weaknesses</h2>
+        <p class="lead">Elemental affinities for every Persona and every named Shadow in Royal. Ordinary Shadows share the affinities of the Persona they turn into, so if an enemy isn't in the Shadows list, look up its Persona.</p>
+
+        <div class="wk-tabs" role="tablist" aria-label="Compendium">
+          <button type="button" role="tab" class="wk-tab" data-wktab="shadows" aria-selected="true">Shadows <small id="wkCountShadows"></small></button>
+          <button type="button" role="tab" class="wk-tab" data-wktab="personas" aria-selected="false">Personas <small id="wkCountPersonas"></small></button>
+        </div>
+
+        <div class="toolbar toolbar--compact">
+          <label class="search">
+            <span class="visually-hidden">Search</span>
+            <input type="search" id="wkSearch" placeholder="Search a name, Persona, Arcana or area" autocomplete="off" />
+          </label>
+          <label class="select">
+            <span class="visually-hidden">Filter</span>
+            <select id="wkGroup"></select>
+          </label>
+          <button type="button" class="pill" id="wkDlc" aria-pressed="false" hidden>Hide DLC</button>
+          <div class="filters wk-elems" role="group" aria-label="Weak to" id="wkElems"></div>
+        </div>
+
+        <div class="wk-legend" aria-label="Legend">
+          <span><b class="aff aff--w">Wk</b> Weak (knockdown, 1 More)</span>
+          <span><b class="aff aff--s">Rs</b> Resist (half damage)</span>
+          <span><b class="aff aff--n">Nu</b> Null (no damage)</span>
+          <span><b class="aff aff--r">Rp</b> Repel (bounces back)</span>
+          <span><b class="aff aff--d">Dr</b> Drain (heals them)</span>
+        </div>
+        <p class="resultcount" id="wkResult" aria-live="polite"></p>
+        <div class="wk-wrap">
+          <table class="wk-table" id="wkTable"></table>
+        </div>
+        <p class="planner__credit">Data from the open-source megaten-fusion-tool P5R compendium (checked against the game files). Palaces are numbered to keep spoilers out. Story bosses aren't listed, since most have no fixed weaknesses or change them mid-fight.</p>
+      </section>
+
       <nav class="pager" aria-label="Guide pages">
         <a class="pager__card" href="#top"><span>Back to</span><strong>Top of guide</strong></a>
         <a class="pager__card pager__card--next" href="#trophies"><span>Keep stealing</span><strong>Trophy Tracker</strong></a>
@@ -406,6 +446,7 @@
 
   <script src="trophies.js"></script>
   <script src="planner.js"></script>
+  <script src="compendium.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
